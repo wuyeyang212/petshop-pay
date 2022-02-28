@@ -8,6 +8,7 @@
         v-model="discount.isDiscount"
         class="ml-2"
         active-color="#13ce66"
+        :disabled="discount.isReduce"
       />
       <div
         class="detail"
@@ -33,6 +34,7 @@
         v-model="discount.isReduce"
         class="ml-2"
         active-color="#13ce66"
+        :disabled="discount.isDiscount"
       />
       <div
         class="detail"
@@ -208,7 +210,6 @@
 </template>
 
 <script>
-import { ref } from 'vue'
 import { api } from './config';
 
 export default {
@@ -217,11 +218,11 @@ export default {
       discount: {
         isDiscount: true,
         discountValue: '',
-        isReduce: true,
+        isReduce: false,
         reduceValue: '',
-        isFreeGift: true,
+        isFreeGift: false,
         isSmallChange: true,
-        smallChangeType: '',
+        smallChangeType: 'CENT',
         isAutoSmallChange: true,
         isChangePrice: true,
         changePriceType: 'MONEY',

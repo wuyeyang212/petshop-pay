@@ -26,16 +26,17 @@
         type="primary"
         @click="openDialog(1)"
       >自定义折扣</el-button>
+      <el-button type="primary">{{ `${discountForm.discountValue}折` }}</el-button>
       <p>整单减价</p>
       <el-button
         type="primary"
         @click="openDialog(2)"
       >自定义减价</el-button>
-      <p>整单改价</p>
+      <!-- <p>整单改价</p>
       <el-button
         type="primary"
         @click="openDialog(3)"
-      >自定义价格</el-button>
+      >自定义价格</el-button> -->
     </div>
     <el-dialog
       v-model="editVisible"
@@ -123,7 +124,7 @@ export default {
         })
       } else {
         this.editVisible = false
-        this.$store.commit('cart/ADD_REDUCE', this.discountForm)
+        // this.$store.commit('cart/ADD_REDUCE', this.discountForm)
       }
     },
     oninput(e) {

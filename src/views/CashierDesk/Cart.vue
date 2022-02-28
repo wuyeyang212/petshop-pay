@@ -109,27 +109,11 @@
       >
         <span>优惠明细<span class="alittle">></span></span>
       </div>
-      <!-- <div class="inline-flex">
-        <span style="font-size:20px">*</span>
-        业务员：
-        <el-select
-          v-model="salesmanId"
-          filterable
-          placeholder="请选择"
-          @change="onChangeSalesman"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.id"
-            :label="item.salespersonName"
-            :value="item.id"
-          />
-        </el-select>
-      </div> -->
+
     </el-row>
     <el-row
       class="bottom"
-      justify="center"
+      justify="space-between"
     >
       <!-- <el-button
         class="bottom-btn"
@@ -149,7 +133,24 @@
       >
         优惠
       </el-button> -->
-      <div class="bdge-wrap">
+      <div class="inline-flex">
+        导购员：
+        <el-select
+          v-model="salesmanId"
+          filterable
+          placeholder="请选择"
+          @change="onChangeSalesman"
+          style="width:100px"
+        >
+          <el-option
+            v-for="item in options"
+            :key="item.id"
+            :label="item.salespersonName"
+            :value="item.id"
+          />
+        </el-select>
+      </div>
+      <!-- <div class="bdge-wrap">
         <span
           v-if="pendOrderCount"
           class="bdage"
@@ -159,8 +160,12 @@
           :loading="pendOrderLoading"
           @click="handleFetchOrder"
         >挂/取单</el-button>
-      </div>
-      <el-button class="bottom-btn">收款<span>￥0.00</span></el-button>
+      </div> -->
+      <el-button
+        :loading="settleLoading"
+        class="bottom-btn"
+        @click="handlePaymentOrder"
+      >收款<span>￥0.00</span></el-button>
       <el-button
         class="bottom-btn"
         @click="editVisible = true"
@@ -219,6 +224,7 @@
             :label="city"
           >
             {{ city }}
+            <span style="margin-left:6px">{{ "111" }}</span>
           </el-checkbox-button>
         </el-checkbox-group>
       </el-row>
@@ -485,13 +491,9 @@
               <span>
                 <el-input
                   v-model="price"
-                  type="number"
-                  step="0.01"
-                  :min="10"
-                  :max="200"
                   class="mount"
+                  placeholder="输入金额"
                 >
-                  <template #append>元</template>
                 </el-input>
                 <span class="left">改价范围：¥0.01 - ¥100169.00</span>
               </span>
@@ -505,13 +507,9 @@
               <span>
                 <el-input
                   v-model="discount"
-                  type="number"
-                  step="0.01"
-                  :min="10"
-                  :max="200"
                   class="mount"
+                  placeholder="输入折扣"
                 >
-                  <template #append>%</template>
                 </el-input>
                 <span class="left">折扣范围：1.0 - 59271.0%</span>
               </span>
@@ -543,7 +541,7 @@
 <script>
 import GoodCard from './components/GoodCard.vue'
 import KeyBoard from './components/KeyBoard/index.vue'
-// import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 // import { deepClone } from '../../utils/index'
 export default {
   components: { GoodCard, KeyBoard },
@@ -665,7 +663,7 @@ export default {
     }
   },
   computed: {
-    // ...mapGetters(['cart', 'settle', 'userInfo']),
+    ...mapGetters(['cart', 'settle', 'userInfo']),
     // getSummary() {
     //   // 合计 = 商品总价 - 优惠价 + 运费
     //   let { total_price, reduceValue } = this.cart
@@ -974,7 +972,7 @@ export default {
         this.$http.post(this.$api.settleOrder, this.getSubmitParams())
           .then((res) => {
             // 设置后台结算返回数据
-            this.$store.commit('cart/SET_SETTLE_DATA', res.data || {})
+            // this.$store.commit('cart/SET_SETTLE_DATA', res.data || {})
             this.$emit('openPage', 'payment')
           })
           .finally(() => {
@@ -1206,11 +1204,13 @@ export default {
     .el-checkbox-button {
       margin-right: 20px;
       margin-bottom: 20px;
-
-      //     border: 1px solid #dcdfe6;
     }
     ::v-deep(.el-checkbox-button__inner) {
       border: 1px solid #dcdfe6;
+      border-radius: 4px;
+    }
+    ::v-deep(.is-checked .el-checkbox-button__inner) {
+      border: 1px solid #409eff;
       border-radius: 4px;
     }
   }

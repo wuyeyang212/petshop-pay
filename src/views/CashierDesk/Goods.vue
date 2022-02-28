@@ -135,7 +135,7 @@
         <!-- :disabled="!cart.goods.length" -->
         优惠
       </el-button>
-      <el-button class="bottom-btn">备注</el-button>
+      <!-- <el-button class="bottom-btn">备注</el-button> -->
       <el-button
         class="bottom-btn"
         @click="handleSpecs"
@@ -180,7 +180,7 @@
 
 <script>
 import GoodCard from './components/GoodCard.vue'
-// import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 import { ElInfiniteScroll } from 'element-plus'
 export default {
   directives: {
@@ -214,7 +214,49 @@ export default {
         pageSize: 20,
         nameOrNo: ''
       },
-      goodsList: [],
+      goodsList: [{
+        businessType: 'NORMAL', //商品类型: NORMAL普通商品, STORE_CARD储值卡, TIME_CARD次卡
+        businesses: [
+          {
+            businessType: '导购员',//	业务员类型：SALES_MAN:导购员，OPERATOR:操作员
+            personId: '0989'
+          }
+        ],
+        buyCount: 1, //购买数量
+        buyRefId: 0,//	购买类型关联ID, 普通商品为0
+        buyType: 'NORMAL',	  //购买类型: BUY_TYPE: NORMAL非赠品, GIFT:普通赠品, TIME_CARD:次卡
+        discountPrice: 0.00,	//折扣价，未改价不传值，两位小数
+        discountRate: 1,      //折扣率, 未改价为1
+        isEdit: false,      //	是否已改过价
+        productId: 4535634, //	商品ID或者储值卡次卡ID
+        retailPrice: 34.00,  //	零售价，两位小数
+        skuId: 0,     //	商品sku-id, 无规格商品不传值
+        subtotalAmount: 34.00, //小计总金额, 未改价不传值
+        discountAmount: 0.00, //	整单折扣值/整单立减值
+        discountType: '',  //	discount: 整单折扣; reduce: 整单立减, 不传值，表示未参与收银台优惠
+        payments: [  //付款明细（组合支付）
+          {
+            change: 0.00, //	支付找零金额 ，两位小数
+            details: [  //储值卡支付信息，当支付类型为【余额支付】时必传
+              {
+                customerId: '',  //	客户ID,当支付类型为【押金支付】时必传
+                pay: '',  //	支付金额，两位小数
+                storeCardId: '',  //	储值卡id
+              }
+            ],
+            pay: 0.00, //	支付金额，两位小数
+            payId: '',  //	支付类型ID
+            payType: '', //	支付类型
+          }
+        ],
+        isSmallChange: false, //	是否抹零
+        offerAmount: 0.00,  //	优惠金额，所有优惠金额综合
+        paymentAmount: 0.00, //	应收金额
+        receiveAmount: 0.00,	 //收到金额，实际支付金额
+        smallChangeAmount: 0.00, //	抹零金额
+        totalAmount: 0.00, //	总价金额，订单商品的原价*数量
+        remark: ''   //	商家备注
+      }],
       busy: false,
       loading: false,
       cart: {
@@ -240,7 +282,7 @@ export default {
     }
   },
   computed: {
-    // ...mapGetters(['cart'])
+    ...mapGetters(['cart'])
   },
   watch: {
     'cart.goods': {

@@ -88,22 +88,12 @@
           <span class="price">￥{{ '0.00' }}</span>
         </div>
       </el-row>
-      <el-row class="staff">
-        <span>导购员：</span>
-        <span class="space">xxx</span>
-        <span class="space">|</span>
-        <span>操作人：</span>
-        <span class="space">xxx</span>
-        <el-icon class="close">
-          <circle-plus />
-        </el-icon>
-      </el-row>
     </template>
   </div>
 </template>
 
 <script>
-// import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 export default {
   props: {
     data: {
@@ -148,7 +138,7 @@ export default {
       })
       return storage
     },
-    // ...mapGetters(['cart'])
+    ...mapGetters(['cart'])
   },
   methods: {
     handleChooseGoods() {
@@ -177,7 +167,7 @@ export default {
 
 <style lang="less" scoped>
 .desk-goods-card {
-  width: 100%;
+  // width: 100%;
   padding: 10px 20px;
   margin-bottom: 20px;
   border-radius: 5px;

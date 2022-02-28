@@ -33,7 +33,7 @@ export const initApp = function (App, router, f) {
     app.component('Search', Search)
     app.component('CloseBold', CloseBold)
     app.component('ArrowDown', ArrowDown)
-    app.component('CirclePlus', ArrowDown)
+    app.component('CirclePlus', CirclePlus)
     app.use(http, router, {
         auth() {
             // 用户需要登录

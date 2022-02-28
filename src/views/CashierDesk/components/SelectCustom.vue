@@ -1,6 +1,6 @@
 <template>
   <div class="select-custom">
-    <template v-if="hasUser">
+    <template v-if="hasUser == '0'">
       <div class="header">
         <el-icon
           @click="handleClose"
@@ -47,7 +47,21 @@
         />
       </div>
     </template>
-    <template v-else>
+    <template v-if="hasUser == '1'">
+      <div class="header">
+        <div>会员详情</div>
+        <el-icon
+          @click="handleClose"
+          class="close"
+        >
+          <close-bold />
+        </el-icon>
+      </div>
+      <div class="content">
+
+      </div>
+    </template>
+    <template v-if="hasUser == '2'">
       <div class="no-user">
         <span class="title">未查询到 13801380001 客户信息，快速创建</span>
         <span class="msg"><img src="../../../assets/store/create_user.png">补充客户信息</span>
@@ -83,6 +97,7 @@
           >返回输入</el-button>
           <el-button
             class="active-btn"
+            type="primary"
             @click="handleSubmit"
           >确定创建</el-button>
         </div>
@@ -112,7 +127,7 @@ export default {
     return {
       phoneOrName: '',
       customerList: [],
-      hasUser: true,
+      hasUser: '2',// 0搜索页面  1有客户  2无客户
       form: {
         name: '',
         sex: '男'
@@ -177,7 +192,12 @@ export default {
   min-height: calc(100vh - 88px);
   background: #fff;
   .header {
-    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 40px;
+    div {
+      line-height: 44px;
+    }
     .close {
       font-size: 24px;
       padding: 10px;
