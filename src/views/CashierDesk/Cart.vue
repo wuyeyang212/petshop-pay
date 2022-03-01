@@ -18,7 +18,7 @@
           {{ cart.memberPhone ? '切换客户' : '选择客户' }}
         </el-button>
         <span v-if="cart.memberPhone">
-          {{ cart.memberPhone | encryptPhone }}
+          {{ cart.memberPhone || encryptPhone }}
           {{ '\u00a0\u00a0\u00a0' + cart.memberName }}
         </span>
       </el-col>
@@ -164,6 +164,7 @@
       <el-button
         :loading="settleLoading"
         class="bottom-btn"
+        :disabled="!cart.goods.length"
         @click="handlePaymentOrder"
       >收款<span>￥0.00</span></el-button>
       <el-button
@@ -541,7 +542,7 @@
 <script>
 import GoodCard from './components/GoodCard.vue'
 import KeyBoard from './components/KeyBoard/index.vue'
-import { mapGetters } from 'vuex'
+// import { mapGetters } from 'vuex'
 // import { deepClone } from '../../utils/index'
 export default {
   components: { GoodCard, KeyBoard },
@@ -640,7 +641,27 @@ export default {
         ]
       },
       cart: {
-        goods: [],
+        goods: [
+          {
+            businessType: 'NORMAL', //商品类型: NORMAL普通商品, STORE_CARD储值卡, TIME_CARD次卡  √
+            businesses: [
+              {
+                businessType: '导购员',//	业务员类型：SALES_MAN:导购员，OPERATOR:操作员
+                personId: '0989'
+              }
+            ],
+            buyCount: 1, //购买数量  √
+            buyRefId: 0,//	购买类型关联ID, 普通商品为0
+            buyType: 'NORMAL',	  //购买类型: BUY_TYPE: NORMAL非赠品, GIFT:普通赠品, TIME_CARD:次卡
+            discountPrice: 0.00,	//折扣价，未改价不传值，两位小数
+            discountRate: 1,      //折扣率, 未改价为1
+            isEdit: false,      //	是否已改过价  √
+            productId: 4535634, //	商品ID或者储值卡次卡ID  √
+            retailPrice: 34.00,  //	零售价，两位小数
+            skuId: 0,     //	商品sku-id, 无规格商品不传值
+            subtotalAmount: 34.00, //小计总金额, 未改价不传值
+          }
+        ],
         payments: [], // 支付列表
         total_price: '', // 实际支付金额
         discountValue: '', // 优惠价或折扣率
@@ -659,11 +680,63 @@ export default {
         settlementCode: '',
         settlementName: ''
       },
+      goodsList: [{
+        businessType: 'NORMAL',   //	业务类别：NORMAL: 直接收银台, FOSTER: 寄养 √
+        configId: 2324, //	收银台配置ID √
+        customerId: 123, //	客户ID
+        refId: 123,  //	关联业务id
+        coupons: [1223],  //	优惠券ID，目前仅支持单张优惠券
+        details: [ //结算商品列表
+          {
+            businessType: 'NORMAL', //商品类型: NORMAL普通商品, STORE_CARD储值卡, TIME_CARD次卡  √
+            businesses: [
+              {
+                businessType: '导购员',//	业务员类型：SALES_MAN:导购员，OPERATOR:操作员
+                personId: '0989'
+              }
+            ],
+            buyCount: 1, //购买数量  √
+            buyRefId: 0,//	购买类型关联ID, 普通商品为0
+            buyType: 'NORMAL',	  //购买类型: BUY_TYPE: NORMAL非赠品, GIFT:普通赠品, TIME_CARD:次卡
+            discountPrice: 0.00,	//折扣价，未改价不传值，两位小数
+            discountRate: 1,      //折扣率, 未改价为1
+            isEdit: false,      //	是否已改过价  √
+            productId: 4535634, //	商品ID或者储值卡次卡ID  √
+            retailPrice: 34.00,  //	零售价，两位小数
+            skuId: 0,     //	商品sku-id, 无规格商品不传值
+            subtotalAmount: 34.00, //小计总金额, 未改价不传值
+          }
+        ],
+        discountAmount: 0.00, //	整单折扣值/整单立减值
+        discountType: '',  //	discount: 整单折扣; reduce: 整单立减, 不传值，表示未参与收银台优惠
+        payments: [  //付款明细（组合支付）
+          {
+            change: 0.00, //	支付找零金额 ，两位小数
+            details: [  //储值卡支付信息，当支付类型为【余额支付】时必传
+              {
+                customerId: '',  //	客户ID,当支付类型为【押金支付】时必传
+                pay: '',  //	支付金额，两位小数  √
+                storeCardId: '',  //	储值卡id   √
+              }
+            ],
+            pay: 0.00, //	支付金额，两位小数   √
+            payId: '',  //	支付类型ID  √
+            payType: '', //	支付类型   √
+          }
+        ],
+        isSmallChange: false, //	是否抹零   √
+        offerAmount: 0.00,  //	优惠金额，所有优惠金额综合   √
+        paymentAmount: 0.00, //	应收金额   √
+        receiveAmount: 0.00,	 //收到金额，实际支付金额   √
+        smallChangeAmount: 0.00, //	抹零金额
+        totalAmount: 0.00, //	总价金额，订单商品的原价*数量  √
+        remark: ''   //	商家备注
+      }],
       settle: {}
     }
   },
   computed: {
-    ...mapGetters(['cart', 'settle', 'userInfo']),
+    // ...mapGetters(['cart', 'settle', 'userInfo']),
     // getSummary() {
     //   // 合计 = 商品总价 - 优惠价 + 运费
     //   let { total_price, reduceValue } = this.cart
@@ -922,63 +995,69 @@ export default {
     },
     getSubmitParams() {
       const {
-        goods, discountValue, discountType, express, salesmanId, salesmanName, customerId,
-        customerCode, customerName, memberName, memberPhone, settlementId,
-        settlementCode, settlementName
+        goods, businessType, configId, customerId, refId, coupons, discountAmount, discountType, isSmallChange, offerAmount,
+        paymentAmount, receiveAmount, smallChangeAmount, totalAmount, remark
       } = this.cart
-      const skus = []
+      const details = [],
+        businesses = [{
+          businessType: '',
+          personId: ''
+        }];//商品操作员列表
       goods.forEach(i => {
-        skus.push({
-          buyCount: i.chooseStorage,
-          retailPrice: i.retailPrice,
-          discountRate: i.discount,
+        details.push({
+          businessType: i.businessType,
+          businesses: businesses,
+          buyCount: i.buyCount,
+          buyRefId: i.buyRefId,
+          buyType: i.buyType,
           discountPrice: i.discountPrice,
-          gift: Number(i.gift),
-          skuId: i.id,
-          skuName: i.name,
-          skuNo: i.skuNo,
-          skuSpecName: i.spec,
-          skuUnit: i.unit
+          discountRate: i.discount,
+          isEdit: i.isEdit,
+          productId: i.productId,
+          retailPrice: i.retailPrice,
+          skuId: i.skuId,
+          subtotalAmount: i.subtotalAmount,
         })
       })
       const params = {
+        businessType: businessType,
+        configId: configId,
+        customerId: customerId || null,
+        refId: refId || null,
+        coupons: coupons || null,
+        details,
+        discountAmount: discountAmount || null,
         discountType: discountType || null,
-        discountValue: discountValue || null,
-        express: express || null,
-        // remark: note,
-        salesmanId,
-        salesmanName,
-        customerId,
-        customerCode,
-        customerName,
-        memberName,
-        memberPhone,
-        settlementId,
-        settlementCode,
-        settlementName,
-        skus
+
+        isSmallChange: isSmallChange,
+        offerAmount: offerAmount,
+        paymentAmount: paymentAmount,
+        receiveAmount: receiveAmount,
+        smallChangeAmount: smallChangeAmount || null,
+        totalAmount: totalAmount,
+        remark: remark
       }
       return params
     },
     // 结算订单
     handlePaymentOrder() {
-      if (this.salesmanId === '' || this.salesmanId === undefined) {
-        this.$message({
-          message: '请选择业务员后再进行结算',
-          type: 'warning'
+      // if (this.salesmanId === '' || this.salesmanId === undefined) {
+      //   this.$message({
+      //     message: '请选择业务员后再进行结算',
+      //     type: 'warning'
+      //   })
+      // } else {
+      this.settleLoading = true
+      this.$http.post(this.$api.settleOrder, this.getSubmitParams())
+        .then((res) => {
+          // 设置后台结算返回数据
+          // this.$store.commit('cart/SET_SETTLE_DATA', res.data || {})
+          this.$emit('openPage', 'payment')
         })
-      } else {
-        this.settleLoading = true
-        this.$http.post(this.$api.settleOrder, this.getSubmitParams())
-          .then((res) => {
-            // 设置后台结算返回数据
-            // this.$store.commit('cart/SET_SETTLE_DATA', res.data || {})
-            this.$emit('openPage', 'payment')
-          })
-          .finally(() => {
-            this.settleLoading = false
-          })
-      }
+        .finally(() => {
+          this.settleLoading = false
+        })
+      // }
     },
     // 获取业务员列表
     getSalesmanNameList() {

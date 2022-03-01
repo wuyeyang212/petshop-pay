@@ -4,8 +4,9 @@
  */
 
 export const api = {
-    'cashierConfig': '/cashier/config'
+    'cashierConfig': '/cashier/config',
     // 'cashierConfig': '/api/pay/cashier/config'
+    'settleOrder': '/cashier/settle'
 };
 const exports = {
     api

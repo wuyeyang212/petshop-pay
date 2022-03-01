@@ -18,7 +18,8 @@ let app = null;
 
 function render(dom) {
     app = initApp(App, router);
-    app = initApp(App, store);
+    // app = initApp(App, store);
+    // app = use(store);
     for (let iconName in ELIcons) {
         app.component(iconName, ELIcons[iconName])
     }

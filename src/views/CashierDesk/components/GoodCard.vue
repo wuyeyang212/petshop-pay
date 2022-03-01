@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="{ 'desk-goods-card': true, 'active': data.chooseStorage && !operate }"
+    :class="{ 'desk-goods-card': true, 'active': data.buyCount && !operate }"
     :style="{ height: operate ? '110px' : data.gift ? '100px' : '80px' }"
     @click="handleChooseGoods"
   >
@@ -41,8 +41,7 @@
         <span class="price">￥{{ data.retailPrice || '--' }}</span>
         <el-input-number
           :key="data.id"
-          v-model="data.chooseStorage"
-          v-input-limit="{min: 1, max: getMaxStorage, precision: 0}"
+          v-model="data.buyCount"
           :precision="0"
           :min="1"
           :max="getMaxStorage"
@@ -50,8 +49,9 @@
           @input="handleEditCart"
           @click.stop
         />
+        <!-- v-input-limit="{min: 1, max: getMaxStorage, precision: 0}" -->
         <span class="price operate-price">
-          ￥{{ data.gift ? '0.00' : (data.discountPrice * data.chooseStorage).toFixed(2) }}
+          ￥{{ data.gift ? '0.00' : (data.discountPrice * data.buyCount).toFixed(2) }}
         </span>
       </el-row>
       <el-row class="staff">
@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+// import { mapGetters } from 'vuex'
 export default {
   props: {
     data: {
@@ -107,6 +107,9 @@ export default {
   },
   data() {
     return {
+      cart: {
+        goods: []
+      }
     }
   },
   computed: {
@@ -116,13 +119,13 @@ export default {
       if (this.data.gift) {
         this.cart.goods.forEach(i => {
           if (i.id === this.data.id && !i.gift) {
-            storage = i.chooseStorage
+            storage = i.buyCount
           }
         })
       } else {
         this.cart.goods.forEach(i => {
           if (i.id === this.data.id && i.gift) {
-            storage = i.chooseStorage
+            storage = i.buyCount
           }
         })
       }
@@ -133,12 +136,12 @@ export default {
       let storage = 0
       this.cart.goods.forEach(i => {
         if (i.id === this.data.id) {
-          storage += i.chooseStorage
+          storage += i.buyCount
         }
       })
       return storage
     },
-    ...mapGetters(['cart'])
+    // ...mapGetters(['cart'])
   },
   methods: {
     handleChooseGoods() {
